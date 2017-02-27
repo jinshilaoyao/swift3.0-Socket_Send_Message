@@ -38,6 +38,13 @@ class YYSocketManager: NSObject {
         }
     }
     
+    func stopHeartBeat() {
+        if sendHeartbeatTimer != nil {
+            sendHeartbeatTimer?.invalidate()
+            sendHeartbeatTimer = nil
+        }
+    }
+    
     func onTimer(sender: Timer) {
         print("heart")
     }
@@ -161,7 +168,7 @@ extension YYSocketManager: GCDAsyncSocketDelegate {
     func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
         sock.disconnect()
         delegate?.socketDidDisconnect()
-        
+        stopHeartBeat()
         reConnect(port: sock.connectedPort)
 //        do {
 //            try sock.connect(toHost: sock.connectedHost!, onPort: sock.connectedPort)

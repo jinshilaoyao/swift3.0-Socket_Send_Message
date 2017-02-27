@@ -21,10 +21,9 @@ class ViewController: UIViewController {
         let manager = YYSocketManager.shareSocketManager
         manager.addDelegate(delegate: self, withHost: "127.0.0.1", withPort: 6969)
         
-        let data = "commond jopker".data(using: .utf8) as? NSData
-//        let data = string.dataUsingEncoding(NSUTF8StringEncoding)
+        let data = "commond jopker".data(using: .utf8)
         
-        manager.sendData(data: data, withHost: "127.0.0.1", withPort: 6969)
+        manager.sendData(data: data as NSData?, withHost: "127.0.0.1", withPort: 6969)
     }
 
 
@@ -41,7 +40,8 @@ extension ViewController: SocketManagerDelegate {
         
     }
     func socketDidReadData(data: NSData) {
-        
+        let read = String(data: data as Data, encoding: .utf8) ?? "fail"
+        print(read)
     }
 }
 

@@ -93,9 +93,12 @@ class YYSocketManager: NSObject {
     }
     
     func disConnect(port: UInt16) {
-//        ((socketDelegateDictionary.object(forKey: "\(port)") as AnyObject)
-        let socket = socketDelegateDictionary.object(forKey: "\(port)") as AnyObject
-        socket.disconnect()
+        
+        guard let sockets = socketDictionary.object(forKey: "\(port)") as? GCDAsyncSocket else {
+            return
+        }
+        sockets.disconnect()
+        socketDictionary.removeObject(forKey: "\(port)")
     }
     
     
@@ -172,10 +175,15 @@ extension YYSocketManager: GCDAsyncSocketDelegate {
     }
     
     func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
-        let socketDelegates = socketDelegateDictionary.object(forKey: "\(sock.connectedPort)") as! NSMutableArray
+        
+        guard let socketDelegates = socketDelegateDictionary.object(forKey: "\(sock.connectedPort)") as? Array<AnyObject> else {
+            return
+        }
+        
+        
         for socketDelegate in socketDelegates
         {
-            delegate?.socketDidReadData(data: data as NSData)
+            socketDelegate.socketDidReadData(data: data as NSData)
         }
         sock.readData(withTimeout: -1, tag: 0)
     }
